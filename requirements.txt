@@ -1,11 +1,30 @@
-ultralytics
+# Core libraries
 numpy
 pandas
+
+# Visualization
 matplotlib
 seaborn
+
+# Image processing
 opencv-python
 Pillow
+
+# Progress monitoring
 tqdm
+
+# Machine learning
 scikit-learn
+
+# Data augmentation
 albumentations
+
+# Configuration management
 pyyaml
+
+# Deep learning and YOLOv8
+ultralytics
+
+# Jupyter Notebook support (optional but recommended for EDA)
+jupyter
+ipykernel
