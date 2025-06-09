@@ -195,3 +195,4 @@ cython_debug/
 
 # Explicitly ignore the virtual environment directory
 .venv/
+data/sampled/sampled_train/
