@@ -26,7 +26,10 @@ FULL_DATA_TRAIN_DIR = os.path.join(PROJECT_ROOT, "..", "byu-locating-bacterial-f
 # Directory for externally stored sampled training images
 EXTERNAL_SAMPLED_TRAIN_DIR = os.path.join(PROJECT_ROOT, "data", "sampled", "sampled_train")
 
-DATASET_DIR = os.path.join(PROJECT_ROOT, "data", "sampled_train")
+SAMPLED_TRAIN_DATASET_DIR = os.path.join(PROJECT_ROOT, "data", "sampled_train")
+TRAIN_DATASET_DIR  = os.path.join(PROJECT_ROOT, "data", "train")
+USE_SAMPLED_TRAIN_DATASET = False
+
 PREPROCESSED_DATASET_DIR = os.path.join(PROJECT_ROOT,"data","preprocessed_data")
 YOLO_DATA_DIR =  os.path.join(PROJECT_ROOT, "data", "yolo")
 AUGMENTED_YOLO_DATA =  os.path.join(PROJECT_ROOT, "data", "augmented_yolo_data")
