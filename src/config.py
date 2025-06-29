@@ -4,6 +4,10 @@ import os
 # Define base project directory
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
+
+SRC = os.path.join(PROJECT_ROOT, "src")
+
+
 # Data directories
 RAW_DATA_DIR = os.path.join(PROJECT_ROOT, "data", "raw")
 SAMPLED_DATA_DIR = os.path.join(PROJECT_ROOT, "data", "sampled")
@@ -32,4 +36,9 @@ USE_SAMPLED_TRAIN_DATASET = False
 
 PREPROCESSED_DATASET_DIR = os.path.join(PROJECT_ROOT,"data","preprocessed_data")
 YOLO_DATA_DIR =  os.path.join(PROJECT_ROOT, "data", "yolo")
+
+YOLO_TRAIN_DIR =  os.path.join(YOLO_DATA_DIR, "images", "train")
+YOLO_VAL_DIR =  os.path.join(YOLO_DATA_DIR, "images", "val")
+
 AUGMENTED_YOLO_DATA =  os.path.join(PROJECT_ROOT, "data", "augmented_yolo_data")
+YOLO_RESULT = os.path.join(PROJECT_ROOT, "data", "runs", "train")

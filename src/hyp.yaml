@@ -1,0 +1,8 @@
+box: 0.05
+cls: 0.5
+fl_gamma: 1.5
+label_smoothing: 0.0
+lr0: 0.01
+mixup: 0.5
+mosaic: 1.0
+obj: 1.0
