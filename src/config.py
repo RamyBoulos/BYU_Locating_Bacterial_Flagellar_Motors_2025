@@ -1,5 +1,6 @@
 # src/config.py
 import os
+import glob
 
 # Define base project directory
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -30,6 +31,43 @@ SAMPLED_TRAIN_DATASET_DIR = os.path.join(PROJECT_ROOT, "data", "sampled_train")
 TRAIN_DATASET_DIR  = os.path.join(PROJECT_ROOT, "data", "train")
 USE_SAMPLED_TRAIN_DATASET = False
 
-PREPROCESSED_DATASET_DIR = os.path.join(PROJECT_ROOT,"data","preprocessed_data")
+PREPROCESSED_DATASET_DIR = os.path.join(PROJECT_ROOT, "data", "preprocessed_data_3d")  # Directory for 3D preprocessed data
+
+# Automatically find the latest preprocessing log CSV (used during training)
+log_files = sorted(glob.glob(os.path.join(PREPROCESSED_DATASET_DIR, "preprocessing_log_*.csv")))
+PREPROCESSING_LOG_CSV = log_files[-1] if log_files else None
+
 YOLO_DATA_DIR =  os.path.join(PROJECT_ROOT, "data", "yolo")
 AUGMENTED_YOLO_DATA =  os.path.join(PROJECT_ROOT, "data", "augmented_yolo_data")
+
+# Sampled tomogram directories (not tracked in Git, local path must exist)
+SAMPLED_TOMO_DIR = os.path.join(PROJECT_ROOT, "sampled_train")
+
+# Warn if SAMPLED_TOMO_DIR does not exist
+if not os.path.exists(SAMPLED_TOMO_DIR):
+    print(f"⚠️ WARNING: SAMPLED_TOMO_DIR not found: {SAMPLED_TOMO_DIR}")
+
+# Example tomogram (for testing or reference)
+EXAMPLE_TOMO_ID = "tomo_0a8f05"
+EXAMPLE_TOMO_DIR = os.path.join(SAMPLED_TOMO_DIR, EXAMPLE_TOMO_ID)
+
+# Target voxel spacing for 3D resampling (angstroms per voxel)
+TARGET_VOXEL_SPACING = 15.6  # Median_Voxel_Value
+
+# Heatmap generation parameters
+GAUSSIAN_SIGMA = 2.0
+GAUSSIAN_PATCH_RADIUS = 6
+
+# Flag to determine whether to use log-filtered tomograms during training
+USE_LOG_FILTER = True
+
+# Load filtered tomogram IDs from latest log CSV if enabled
+if USE_LOG_FILTER and PREPROCESSING_LOG_CSV:
+    import pandas as pd
+    try:
+        df = pd.read_csv(PREPROCESSING_LOG_CSV)
+        LOG_FILTERED_TOMO_IDS = df.loc[~df["skipped"], "tomo_id"].tolist()
+    except Exception:
+        LOG_FILTERED_TOMO_IDS = []
+else:
+    LOG_FILTERED_TOMO_IDS = None

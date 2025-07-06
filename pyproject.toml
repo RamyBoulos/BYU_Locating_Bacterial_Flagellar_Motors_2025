@@ -7,9 +7,11 @@ license = "MIT"
 readme = "README.md"
 package-mode = false
 
+packages = [{ include = "src" }]
+
 [tool.poetry.dependencies]
 python = ">=3.11"
-numpy = ">=2.3.0,<3.0.0"
+numpy = ">=1.24,<2.3"
 pandas = ">=2.3.0,<3.0.0"
 matplotlib = ">=3.10.3,<4.0.0"
 seaborn = ">=0.13.2,<0.14.0"
@@ -22,6 +24,7 @@ pyyaml = ">=6.0.2,<7.0.0"
 ultralytics = ">=8.3.157,<9.0.0"
 jupyter = ">=1.1.1,<2.0.0"
 ipykernel = ">=6.29.5,<7.0.0"
+torchio = "^0.20.17"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
@@ -32,3 +35,4 @@ black = "^25.1.0"
 pytest = "^8.4.1"
 flake8 = "^7.3.0"
 pre-commit = "^4.2.0"
+ruff = "^0.12.1"

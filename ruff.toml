@@ -1,0 +1,9 @@
+line-length = 100
+
+[lint]
+select = ["E", "F", "W"]  # Common flake8 rules
+ignore = []
+
+[format]
+quote-style = "double"
+indent-style = "space"
