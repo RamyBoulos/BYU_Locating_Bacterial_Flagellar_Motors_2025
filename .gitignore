@@ -199,3 +199,4 @@ data/sampled/sampled_train/
 sampled_train/
 preprocessed_data/
 data/
+yolo*.pt

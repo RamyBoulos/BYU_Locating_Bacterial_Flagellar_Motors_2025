@@ -14,7 +14,6 @@ SAMPLED_DATA_DIR = os.path.join(PROJECT_ROOT, "data", "sampled")
 
 # File paths
 TRAIN_LABELS_PATH = os.path.join(RAW_DATA_DIR, "train_labels.csv")
-
 SAMPLED_LABELS_PATH = os.path.join(SAMPLED_DATA_DIR, "sampled_train_labels.csv")
 
 SAMPLED_TRAIN_DIR = os.path.join(SAMPLED_DATA_DIR, "sampled_train")
@@ -42,3 +41,11 @@ YOLO_VAL_DIR =  os.path.join(YOLO_DATA_DIR, "images", "val")
 
 AUGMENTED_YOLO_DATA =  os.path.join(PROJECT_ROOT, "data", "augmented_yolo_data")
 YOLO_RESULT = os.path.join(PROJECT_ROOT, "data", "runs", "train")
+YOLO_RESULT_PREDICT = os.path.join(PROJECT_ROOT, "data", "runs", "predict")
+
+# — adjust these paths to your layout —
+WEIGHTS_PATH   = os.path.join(PROJECT_ROOT, "data", "runs", "train", "motor_detection", "weights" ,"best.pt")
+WEIGHTS_TEST_PATH   = os.path.join(PROJECT_ROOT, "data", "runs", "train", "motor_detection_test", "weights" ,"best.pt")
+YOLO_TRAIN_RESULT   = os.path.join(PROJECT_ROOT, "data", "runs", "train")                    
+VAL_IMAGE_DIR  = os.path.join(PROJECT_ROOT, "data", "yolo", "images", "val")     
+OUTPUT_DIR     = os.path.join(PROJECT_ROOT, "data", "runs", "predict", "val_predictions")

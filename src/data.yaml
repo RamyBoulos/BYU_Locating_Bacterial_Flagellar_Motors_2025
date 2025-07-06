@@ -1,0 +1,6 @@
+names:
+- motor
+nc: 1
+path: /home/h4/kein254g/BYU_Locating_Bacterial_Flagellar_Motors_2025/data/yolo
+train: images/train
+val: images/val
