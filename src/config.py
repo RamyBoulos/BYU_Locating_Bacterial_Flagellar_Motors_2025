@@ -31,6 +31,8 @@ EXTERNAL_SAMPLED_TRAIN_DIR = os.path.join(PROJECT_ROOT, "data", "sampled", "samp
 
 SAMPLED_TRAIN_DATASET_DIR = os.path.join(PROJECT_ROOT, "data", "sampled_train")
 TRAIN_DATASET_DIR  = os.path.join(PROJECT_ROOT, "data", "train")
+TRAIN_DATASET_HPC_DIR  = os.path.join("/data", "horse", "ws", "kein254g-team_project", "train")
+
 USE_SAMPLED_TRAIN_DATASET = False
 
 PREPROCESSED_DATASET_DIR = os.path.join(PROJECT_ROOT,"data","preprocessed_data")
