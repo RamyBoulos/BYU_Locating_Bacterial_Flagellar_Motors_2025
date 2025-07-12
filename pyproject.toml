@@ -25,6 +25,7 @@ ultralytics = ">=8.3.157,<9.0.0"
 jupyter = ">=1.1.1,<2.0.0"
 ipykernel = ">=6.29.5,<7.0.0"
 torchio = "^0.20.17"
+tensorboard = "^2.19.0"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
