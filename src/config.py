@@ -42,12 +42,18 @@ YOLO_TRAIN_DIR =  os.path.join(YOLO_DATA_DIR, "images", "train")
 YOLO_VAL_DIR =  os.path.join(YOLO_DATA_DIR, "images", "val")
 
 AUGMENTED_YOLO_DATA =  os.path.join(PROJECT_ROOT, "data", "augmented_yolo_data")
-YOLO_RESULT = os.path.join(PROJECT_ROOT, "data", "runs", "train")
-YOLO_RESULT_PREDICT = os.path.join(PROJECT_ROOT, "data", "runs", "predict")
 
-# — adjust these paths to your layout —
-WEIGHTS_PATH   = os.path.join(PROJECT_ROOT, "data", "runs", "train", "motor_detection", "weights" ,"best.pt")
-WEIGHTS_TEST_PATH   = os.path.join(PROJECT_ROOT, "data", "runs", "train", "motor_detection_test", "weights" ,"best.pt")
-YOLO_TRAIN_RESULT   = os.path.join(PROJECT_ROOT, "data", "runs", "train")                    
-VAL_IMAGE_DIR  = os.path.join(PROJECT_ROOT, "data", "yolo", "images", "val")     
-OUTPUT_DIR     = os.path.join(PROJECT_ROOT, "data", "runs", "predict", "val_predictions")
+YOLO_RESULT = os.path.join(PROJECT_ROOT, "data", "runs", "yolo", "train")
+YOLO_RESULT_PREDICT = os.path.join(PROJECT_ROOT, "data", "runs", "yolo", "predict")
+YOLO_WEIGHTS_PATH   = os.path.join(PROJECT_ROOT, "data", "runs", "yolo", "train", "motor_detection", "weights", "best.pt")
+YOLO_WEIGHTS_TEST_PATH = os.path.join(PROJECT_ROOT, "data", "runs", "yolo", "train", "motor_detection_test", "weights" ,"best.pt")
+YOLO_TRAIN_RESULT   = os.path.join(PROJECT_ROOT, "data", "runs", "yolo", "train")                   
+YOLO_OUTPUT_DIR     =  os.path.join(PROJECT_ROOT, "data", "runs", "yolo", "predict", "val_predictions")
+
+
+RTDETR_RESULT = os.path.join(PROJECT_ROOT, "data", "runs", "rtdetr", "train")
+RTDETR_RESULT_PREDICT = os.path.join(PROJECT_ROOT, "data", "runs", "rtdetr", "predict")
+RTDETR_WEIGHTS_PATH   = os.path.join(PROJECT_ROOT, "data", "runs", "rtdetr", "train", "motor_detection", "weights", "best.pt")
+RTDETR_WEIGHTS_TEST_PATH = os.path.join(PROJECT_ROOT, "data", "runs","rtdetr", "train", "motor_detection_test", "weights" ,"best.pt")
+RTDETR_TRAIN_RESULT   = os.path.join(PROJECT_ROOT, "data", "runs", "rtdetr", "train")                   
+RTDETR_OUTPUT_DIR     =  os.path.join(PROJECT_ROOT, "data", "runs","rtdetr", "predict", "val_predictions")
