@@ -38,6 +38,8 @@ USE_SAMPLED_TRAIN_DATASET = False
 
 PREPROCESSED_DATASET_DIR = os.path.join(WORKSPACE_ROOT,"data","preprocessed_data")
 YOLO_DATA_DIR =  os.path.join(WORKSPACE_ROOT, "data", "yolo")
+RTDETR_DATA_DIR =  os.path.join(WORKSPACE_ROOT, "data", "rtdetr")
+
 
 YOLO_TRAIN_DIR =  os.path.join(YOLO_DATA_DIR, "images", "train")
 YOLO_VAL_DIR =  os.path.join(YOLO_DATA_DIR, "images", "val")
