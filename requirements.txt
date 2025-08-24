@@ -28,3 +28,4 @@ ultralytics
 # Jupyter Notebook support (optional but recommended for EDA)
 jupyter
 ipykernel
+imblearn
