@@ -60,3 +60,5 @@ RTDETR_WEIGHTS_PATH   = os.path.join(WORKSPACE_ROOT, "data", "runs", "rtdetr", "
 RTDETR_WEIGHTS_TEST_PATH = os.path.join(WORKSPACE_ROOT, "data", "runs","rtdetr", "train", "motor_detection_test", "weights" ,"best.pt")
 RTDETR_TRAIN_RESULT   = os.path.join(WORKSPACE_ROOT, "data", "runs", "rtdetr", "train")                   
 RTDETR_OUTPUT_DIR     =  os.path.join(WORKSPACE_ROOT, "data", "runs","rtdetr", "predict", "val_predictions")
+
+TEST_DIR = os.path.join(WORKSPACE_ROOT, "test")

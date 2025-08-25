@@ -200,3 +200,4 @@ sampled_train/
 preprocessed_data/
 data/
 yolo*.pt
+*.pt
