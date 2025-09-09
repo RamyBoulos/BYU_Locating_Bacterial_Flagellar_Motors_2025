@@ -1,0 +1,4 @@
+tomo_id,Motor axis 0,Motor axis 1,Motor axis 2,Has motor
+tomo_003acc_slice,-1,-1,-1,0
+tomo_00e047_slice,526.7847680000001,66.83271,173.0,1
+tomo_01a877_slice,615.812448,66.22704,150.0,1
