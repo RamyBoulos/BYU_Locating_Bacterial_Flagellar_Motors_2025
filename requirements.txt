@@ -29,3 +29,9 @@ ultralytics
 jupyter
 ipykernel
 imblearn
+
+# linter code formatter etc
+ruff
+black
+mypy 
+pytest
