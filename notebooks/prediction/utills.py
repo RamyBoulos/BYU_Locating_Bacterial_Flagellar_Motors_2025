@@ -1,24 +1,32 @@
+"""Utilities for parsing predictions and denormalizing YOLO outputs.
+
+Functions
+---------
+- find_all_predicted_tomo_id_attributes: return rows for a tomo_id from denormalized results
+- find_all_tomo_id_attributes: return rows for a tomo_id from training labels
+- find_tomo_id_slice_attributes: return rows for a tomo_id and slice number
+- find_width_height: get (width, height) for a tomo_id + slice number
+- parse_txt: parse one YOLO .txt prediction file
+- rescale_letterbox: denormalize predictions to pixel space and export CSV
+"""
+
 import glob
 import os
 import sys
 from pathlib import Path
-
+from typing import Union
 import pandas as pd
-
 
 # Ensure repository root is on sys.path so `src` is importable
 repo_root = Path(__file__).resolve().parents[2]
 if str(repo_root) not in sys.path:
     sys.path.insert(0, str(repo_root))
 
-from src import config
-
-# trainLabelDataFrame = pd.read_csv(config.TRAIN_LABELS_PATH)
-
-from typing import Union
+from src import config  # noqa: E402
 
 
-def find_all_predicted_tomoId_attributes(tomo_id: str) -> Union[pd.DataFrame, None]:
+def find_all_predicted_tomo_id_attributes(tomo_id: str) -> Union[pd.DataFrame, None]:
+    """Find all predicted attributes for a given tomo_id."""
     labels_df = pd.read_csv(config.DENORMALIZED_RESULTS)
     filtered_df = labels_df[labels_df["tomo_id"] == tomo_id]
 
@@ -28,7 +36,8 @@ def find_all_predicted_tomoId_attributes(tomo_id: str) -> Union[pd.DataFrame, No
     return filtered_df
 
 
-def find_all_tomoId_attributes(tomo_id: str) -> Union[pd.DataFrame, None]:
+def find_all_tomo_id_attributes(tomo_id: str) -> Union[pd.DataFrame, None]:
+    """Find all attributes for a given tomo_id."""
     labels_df = pd.read_csv(config.TRAIN_LABELS_PATH)
     filtered_df = labels_df[labels_df["tomo_id"] == tomo_id]
 
@@ -38,7 +47,8 @@ def find_all_tomoId_attributes(tomo_id: str) -> Union[pd.DataFrame, None]:
     return filtered_df
 
 
-def find_tomoId_slice_attributes(tomo_id, slice_num) -> Union[pd.DataFrame, None]:
+def find_tomo_id_slice_attributes(tomo_id, slice_num) -> Union[pd.DataFrame, None]:
+    """Find attributes for a given tomo_id and slice_num."""
     print(config.TRAIN_LABELS_PATH)
     labels_df = pd.read_csv(config.TRAIN_LABELS_PATH)
     filtered_df = labels_df[(labels_df["tomo_id"] == tomo_id)]
@@ -51,7 +61,8 @@ def find_tomoId_slice_attributes(tomo_id, slice_num) -> Union[pd.DataFrame, None
 
 
 def find_width_height(tomo_id, slice_num):
-    attributes = find_tomoId_slice_attributes(tomo_id, slice_num)
+    """Find width and height for a given tomo_id and slice_num."""
+    attributes = find_tomo_id_slice_attributes(tomo_id, slice_num)
 
     if attributes is None or attributes.empty:
         print(f"No attributes found for tomo_id: {tomo_id}, slice_num: {slice_num}")
@@ -64,20 +75,17 @@ def find_width_height(tomo_id, slice_num):
 
 
 def parse_txt(file_path, f):
+    """Parse a YOLO format .txt file and return its components."""
     file_name = os.path.basename(file_path)  # e.g. "image1.txt"
     file_id = os.path.splitext(file_name)[0]  # e.g. "image1"
-    _, id, _, slice = file_id.split("_")
-    slice = int(slice)
-    tomoId = "tomo_" + str(id)
+    _, tomo_num, _, slice_idx = file_id.split("_")
+    tomo_id = "tomo_" + str(tomo_num)
     _, confidence, x_center, y_center, width, height = f.readline().strip().split()
-    return tomoId, slice, confidence, x_center, y_center, width, height
-
-
-def cheap_nms():
-    return
+    return tomo_id, int(slice_idx), confidence, x_center, y_center, width, height
 
 
 def rescale_letterbox():
+    """Rescale and denormalize YOLO predictions to original image dimensions."""
     rows = []
 
     print(f"{config.RTDETR_RESULT_LABELS}/*.txt")
@@ -86,33 +94,27 @@ def rescale_letterbox():
         print(f"\n--- Reading: {file_path} ---")
         with open(file_path, "r", encoding="utf-8") as f:
             # print(parse_txt(file_path,f))
-            tomoId, slice, confidence, x_center, y_center, width, height = parse_txt(
+            tomo_id, slice_number, confidence, x_center, y_center, width, height = parse_txt(
                 file_path, f
             )
-            Width, Height = find_width_height(tomoId, slice)
+            img_width, img_height = find_width_height(tomo_id, slice_number)
 
-            if Width is None or Height is None:
-                print(f"Skipping {tomoId}, {slice} due to missing dimensions.")
+            if img_width is None or img_height is None:
+                print(f"Skipping {tomo_id}, {slice_number} due to missing dimensions.")
                 continue
 
-            print(
-                f"Denormalized: {tomoId}, {slice}, {confidence}, {x_center}, {y_center}, {width}, {height}"
-            )
             # denomarize
-            x_center = float(x_center) * Width
-            y_center = float(y_center) * Height
-            width = float(width) * Width
-            height = float(height) * Height
+            x_center = float(x_center) * img_width
+            y_center = float(y_center) * img_height
+            width = float(width) * img_width
+            height = float(height) * img_height
 
             # what about voxel spacing ?
-            print(
-                f"Denormalized: {tomoId}, {slice}, {confidence}, {x_center}, {y_center}, {width}, {height}"
-            )
 
             rows.append(
                 {
-                    "tomo_id": tomoId,
-                    "slice": slice,
+                    "tomo_id": tomo_id,
+                    "slice": slice_number,
                     "confidence": float(confidence),
                     "x_center": x_center,
                     "y_center": y_center,
@@ -126,4 +128,4 @@ def rescale_letterbox():
 
 
 if __name__ == "__main__":
-    print(find_all_tomoId_attributes("tomo_00e047"))
+    print(find_all_tomo_id_attributes("tomo_00e047"))

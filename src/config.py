@@ -1,3 +1,5 @@
+"""Configuration file for project paths and constants."""
+
 # src/config.py
 import os
 
@@ -16,9 +18,7 @@ SAMPLED_DATA_DIR = os.path.join(WORKSPACE_ROOT, "data", "sampled")
 # File paths
 TRAIN_LABELS_PATH = os.path.join(PROJECT_ROOT, "data", "raw", "train_labels.csv")
 SAMPLED_LABELS_PATH = os.path.join(SAMPLED_DATA_DIR, "sampled_train_labels.csv")
-DENORMALIZED_RESULTS = os.path.join(
-    PROJECT_ROOT, "data", "raw", "denormalized_results.csv"
-)
+DENORMALIZED_RESULTS = os.path.join(PROJECT_ROOT, "data", "raw", "denormalized_results.csv")
 
 
 SAMPLED_TRAIN_DIR = os.path.join(SAMPLED_DATA_DIR, "sampled_train")
@@ -26,21 +26,13 @@ SAMPLED_TRAIN_DIR = os.path.join(SAMPLED_DATA_DIR, "sampled_train")
 # File path for full labels CSV (from original dataset, not uploaded to GitHub)
 FULL_LABELS_PATH = os.path.join(RAW_DATA_DIR, "train_labels.csv")
 
-# Directory for full training tomograms (each tomo_id folder with .jpg slices)
-# NOTE: This folder is not uploaded to the GitHub repository due to its large size.
-#         You must manually set this path according to your local setup if needed.
-#         You can set the FULL_DATA_TRAIN_DIR environment variable to override the default.
 FULL_DATA_TRAIN_DIR = os.environ.get(
     "FULL_DATA_TRAIN_DIR",
-    os.path.join(
-        PROJECT_ROOT, "..", "byu-locating-bacterial-flagellar-motors-2025", "train"
-    ),
+    os.path.join(PROJECT_ROOT, "..", "byu-locating-bacterial-flagellar-motors-2025", "train"),
 )
 
 # Directory for externally stored sampled training images
-EXTERNAL_SAMPLED_TRAIN_DIR = os.path.join(
-    PROJECT_ROOT, "data", "sampled", "sampled_train"
-)
+EXTERNAL_SAMPLED_TRAIN_DIR = os.path.join(PROJECT_ROOT, "data", "sampled", "sampled_train")
 
 SAMPLED_TRAIN_DATASET_DIR = os.path.join(WORKSPACE_ROOT, "data", "sampled_train")
 TRAIN_DATASET_DIR = os.path.join(WORKSPACE_ROOT, "data", "train")
@@ -55,9 +47,7 @@ AUGMENTED_YOLO_DATA = os.path.join(PROJECT_ROOT, "data", "augmented_yolo_data")
 YOLO_RESULT = os.path.join(WORKSPACE_ROOT, "data", "runs", "yolo", "train")
 YOLO_RESULT_PREDICT = os.path.join(WORKSPACE_ROOT, "data", "runs", "yolo", "predict")
 YOLO_TRAIN_RESULT = os.path.join(WORKSPACE_ROOT, "data", "runs", "yolo", "train")
-YOLO_OUTPUT_DIR = os.path.join(
-    WORKSPACE_ROOT, "data", "runs", "yolo", "predict", "val_predictions"
-)
+YOLO_OUTPUT_DIR = os.path.join(WORKSPACE_ROOT, "data", "runs", "yolo", "predict", "val_predictions")
 
 
 RTDETR_RESULT = os.path.join(WORKSPACE_ROOT, "rtdetr_batch", "exp2")

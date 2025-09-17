@@ -35,3 +35,9 @@ ruff
 black
 mypy 
 pytest
+black[jupyter]
+mypy
+pylint
+nbqa
+pre-commit
+
