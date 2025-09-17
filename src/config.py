@@ -73,6 +73,10 @@ TEST_DIR = os.path.join(WORKSPACE_ROOT, "test")
 TEST_FLAT_DIR = os.path.join(WORKSPACE_ROOT, "test_flat")
 RTDETR_RESULT = os.path.join(WORKSPACE_ROOT, "rtdetr_batch", "exp2")
 RTDETR_PREDICTION_NORMALIZED_CSV = os.path.join(RAW_DATA_DIR, "predictions_normalized.csv")
+RTDETR_PREDICTION_NORMALIZED_CSV = os.path.join(RAW_DATA_DIR, "denormalized_results.csv")
+NMS_RESULTS_CSV = os.path.join(PROJECT_ROOT, "data","raw", "nms_results.csv")
+
+
 RTDETR_PREDICTION_CSV = os.path.join(RAW_DATA_DIR, "predictions.csv")
 
 
