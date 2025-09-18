@@ -25,6 +25,37 @@ if str(repo_root) not in sys.path:
 from src import config  # noqa: E402
 
 
+def parse_csv_row(line: str):
+    """Parse a CSV row into its components."""
+    parts = line.strip().split(",")
+    return {
+        "tomo_id": parts[0],
+        "slice": int(parts[1]),
+        "confidence": float(parts[2]),
+        "x_center": float(parts[3]),
+        "y_center": float(parts[4]),
+        "width": float(parts[5]),
+        "height": float(parts[6]),
+    }
+
+
+def train_test_validation_split():
+    """Generate train, validation, and test CSV files from the full training labels."""
+
+    df = pd.read_csv(config.TRAIN_LABELS_PATH)
+
+    print(f"Original set size: {len(df)}")
+
+    train_df = df.sample(frac=0.7, replace=False, random_state=1)
+    validation_df = df.drop(train_df.index)
+    test_df = validation_df.sample(frac=1 / 3, replace=False, random_state=1)
+    validation_df = validation_df.drop(test_df.index)
+
+    train_df.to_csv(config.TRAIN_CSV_PATH, index=False)
+    validation_df.to_csv(config.VALIDATION_CSV_PATH, index=False)
+    test_df.to_csv(config.TEST_CSV_PATH, index=False)
+
+
 def find_all_predicted_tomo_id_attributes(tomo_id: str) -> Union[pd.DataFrame, None]:
     """Find all predicted attributes for a given tomo_id."""
     labels_df = pd.read_csv(config.DENORMALIZED_RESULTS)
@@ -128,4 +159,5 @@ def rescale_letterbox():
 
 
 if __name__ == "__main__":
-    print(find_all_tomo_id_attributes("tomo_00e047"))
+    # print(find_all_tomo_id_attributes("tomo_00e047"))
+    print(train_test_validation_split())

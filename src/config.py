@@ -21,6 +21,11 @@ SAMPLED_LABELS_PATH = os.path.join(SAMPLED_DATA_DIR, "sampled_train_labels.csv")
 DENORMALIZED_RESULTS = os.path.join(PROJECT_ROOT, "data", "raw", "denormalized_results.csv")
 
 
+TRAIN_CSV_PATH = os.path.join(PROJECT_ROOT, "data", "raw", "train.csv")
+VALIDATION_CSV_PATH = os.path.join(PROJECT_ROOT, "data", "raw", "validation.csv")
+TEST_CSV_PATH = os.path.join(PROJECT_ROOT, "data", "raw", "test.csv")
+
+
 SAMPLED_TRAIN_DIR = os.path.join(SAMPLED_DATA_DIR, "sampled_train")
 
 # File path for full labels CSV (from original dataset, not uploaded to GitHub)
