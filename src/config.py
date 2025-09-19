@@ -52,6 +52,8 @@ AUGMENTED_YOLO_DATA = os.path.join(PROJECT_ROOT, "data", "augmented_yolo_data")
 YOLO_RESULT = os.path.join(WORKSPACE_ROOT, "data", "runs", "yolo", "train")
 YOLO_RESULT_PREDICT = os.path.join(WORKSPACE_ROOT, "data", "runs", "yolo", "predict")
 YOLO_TRAIN_RESULT = os.path.join(WORKSPACE_ROOT, "data", "runs", "yolo", "train")
+YOLO_VAL_IMAGE_DIR = os.path.join(WORKSPACE_ROOT, "data", "runs", "yolo", "val")
+
 YOLO_OUTPUT_DIR = os.path.join(WORKSPACE_ROOT, "data", "runs", "yolo", "predict", "val_predictions")
 
 
