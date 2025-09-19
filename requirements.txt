@@ -41,3 +41,8 @@ pylint
 nbqa
 pre-commit
 
+# Type stubs for better type checking
+pandas-stubs
+types-PyYAML
+types-tqdm
+types-seaborn

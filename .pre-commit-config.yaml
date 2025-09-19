@@ -10,9 +10,13 @@ repos:
           - black==24.8.0
       - id: nbqa-ruff
         files: \.ipynb$
-        args: [--extend-ignore=E402]
+        args: [--extend-ignore=E402 , --fix]
         additional_dependencies:
           - ruff==0.6.9
+      - id: nbqa-mypy
+        files: \.ipynb$
+        additional_dependencies:
+          - mypy
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.6.9
