@@ -22,10 +22,10 @@ repos:
     rev: v0.6.9
     hooks:
       - id: ruff
-        args: [--extend-ignore=E402]
+        args: [--extend-ignore=E402, --fix]
 
-  - repo: https://github.com/psf/black-pre-commit-mirror
-    rev: 25.1.0
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.18.2
     hooks:
-      - id: black
-        args: [--line-length=100]
+      - id: mypy
+        args: [--strict, --ignore-missing-imports]
