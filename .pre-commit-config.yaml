@@ -28,3 +28,5 @@ repos:
     rev: v1.18.2
     hooks:
       - id: mypy
+        args: [--strict, --ignore-missing-imports]
+        files: ^src/.py$
