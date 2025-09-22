@@ -18,6 +18,8 @@ from typing import Union
 import pandas as pd
 import shutil
 
+from src.types.types import DatasetType
+
 # Ensure repository root is on sys.path so `src` is importable
 repo_root = Path(__file__).resolve().parents[2]
 if str(repo_root) not in sys.path:
@@ -51,9 +53,9 @@ def find_all_predicted_tomo_id_attributes(tomo_id: str) -> Union[pd.DataFrame, N
     return filtered_df
 
 
-def find_all_tomo_ids() -> list:
+def find_all_tomo_ids(type: DatasetType) -> list:
     """Find all unique tomo_ids in the training labels."""
-    labels_df = pd.read_csv(config.TRAIN_LABELS_PATH)
+    labels_df = get_csv_data_frame(type)
     unique_tomo_ids = labels_df["tomo_id"].unique().tolist()
     return unique_tomo_ids
 
@@ -63,6 +65,20 @@ def find_all_train_tomo_ids() -> list:
     labels_df = pd.read_csv(config.TRAIN_CSV_PATH)
     unique_tomo_ids = labels_df["tomo_id"].unique().tolist()
     return unique_tomo_ids
+
+
+def get_csv_data_frame(csv_type: DatasetType) -> pd.DataFrame:
+    """Get the CSV data frame for a specific dataset type."""
+    if csv_type == DatasetType.TRAIN:
+        return pd.read_csv(config.TRAIN_CSV_PATH)
+    elif csv_type == DatasetType.VALID:
+        return pd.read_csv(config.VALIDATION_CSV_PATH)
+    elif csv_type == DatasetType.TEST:
+        return pd.read_csv(config.TEST_CSV_PATH)
+    elif csv_type == DatasetType.ALL:
+        return pd.read_csv(config.FULL_LABELS_PATH)
+    else:
+        raise ValueError(f"Unknown dataset type: {csv_type}")
 
 
 def find_all_tomo_id_attributes(tomo_id: str) -> Union[pd.DataFrame, None]:
@@ -210,22 +226,38 @@ def add_absolute_paths_to_csv():
     df.to_csv(config.TRAIN_CSV_PATH, index=False)
 
 
-def target_file_paths(tomo_id: str):
+def target_file_paths(tomo_id: str, type: DatasetType = DatasetType.TRAIN) -> list:
     """Generate target file paths for YOLO format based on tomo_id."""
     z_length = find_z_axis_length(tomo_id)
+
     if z_length == "":
         return []
     target_paths = [
-        os.path.join(config.YOLO_TRAIN_FORMAT_DIR, generate_filename(tomo_id, i))
+        os.path.join(fetch_dataset_directory(type), generate_filename(tomo_id, i))
         for i in range(int(z_length))
     ]
     return target_paths
 
 
-def move_files_to_yolo_format():
+def fetch_dataset_directory(type: DatasetType = DatasetType.TRAIN) -> str:
+    dir_path = ""
+    if type == DatasetType.TRAIN:
+        dir_path = config.YOLO_TRAIN_FORMAT_DIR
+    elif type == DatasetType.VALID:
+        dir_path = config.YOLO_VAL_FORMAT_DIR
+    elif type == DatasetType.TEST:
+        dir_path = config.YOLO_TEST_FORMAT_DIR
+    elif type == DatasetType.ALL:
+        dir_path = config.YOLO_TRAIN_FORMAT_DIR
+    else:
+        raise ValueError(f"Unknown dataset type: {type}")
+    return dir_path
+
+
+def move_files_to_yolo_format(type: DatasetType = DatasetType.TRAIN):
     """Move files to YOLO format directory structure."""
     # This function is a placeholder and needs to be implemented based on specific requirements.
-    tomos = find_all_train_tomo_ids()
+    tomos = find_all_tomo_ids(type)
     count = 0
 
     for tomo_id in tomos:
@@ -247,4 +279,4 @@ def move_files_to_yolo_format():
 
 if __name__ == "__main__":
     # print(find_all_tomo_id_attributes("tomo_00e047"))
-    print(move_files_to_yolo_format())
+    move_files_to_yolo_format(type=DatasetType.VALID)
