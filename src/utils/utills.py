@@ -16,6 +16,7 @@ import sys
 from pathlib import Path
 from typing import Union
 import pandas as pd
+import shutil
 
 # Ensure repository root is on sys.path so `src` is importable
 repo_root = Path(__file__).resolve().parents[2]
@@ -39,23 +40,6 @@ def parse_csv_row(line: str):
     }
 
 
-def train_test_validation_split():
-    """Generate train, validation, and test CSV files from the full training labels."""
-
-    df = pd.read_csv(config.TRAIN_LABELS_PATH)
-
-    print(f"Original set size: {len(df)}")
-
-    train_df = df.sample(frac=0.7, replace=False, random_state=1)
-    validation_df = df.drop(train_df.index)
-    test_df = validation_df.sample(frac=1 / 3, replace=False, random_state=1)
-    validation_df = validation_df.drop(test_df.index)
-
-    train_df.to_csv(config.TRAIN_CSV_PATH, index=False)
-    validation_df.to_csv(config.VALIDATION_CSV_PATH, index=False)
-    test_df.to_csv(config.TEST_CSV_PATH, index=False)
-
-
 def find_all_predicted_tomo_id_attributes(tomo_id: str) -> Union[pd.DataFrame, None]:
     """Find all predicted attributes for a given tomo_id."""
     labels_df = pd.read_csv(config.DENORMALIZED_RESULTS)
@@ -67,6 +51,20 @@ def find_all_predicted_tomo_id_attributes(tomo_id: str) -> Union[pd.DataFrame, N
     return filtered_df
 
 
+def find_all_tomo_ids() -> list:
+    """Find all unique tomo_ids in the training labels."""
+    labels_df = pd.read_csv(config.TRAIN_LABELS_PATH)
+    unique_tomo_ids = labels_df["tomo_id"].unique().tolist()
+    return unique_tomo_ids
+
+
+def find_all_train_tomo_ids() -> list:
+    """Find all unique tomo_ids in the train labels."""
+    labels_df = pd.read_csv(config.TRAIN_CSV_PATH)
+    unique_tomo_ids = labels_df["tomo_id"].unique().tolist()
+    return unique_tomo_ids
+
+
 def find_all_tomo_id_attributes(tomo_id: str) -> Union[pd.DataFrame, None]:
     """Find all attributes for a given tomo_id."""
     labels_df = pd.read_csv(config.TRAIN_LABELS_PATH)
@@ -76,6 +74,14 @@ def find_all_tomo_id_attributes(tomo_id: str) -> Union[pd.DataFrame, None]:
         return None  # Return None if tomo_id not found
 
     return filtered_df
+
+
+def find_z_axis_length(tomo_id: str) -> int:
+    """Find z axis length for a given tomo_id."""
+    attributes = find_all_tomo_id_attributes(tomo_id)
+    if attributes is not None and not attributes.empty:
+        return int(attributes.iloc[0]["Array shape (axis 0)"])
+    return -1
 
 
 def find_tomo_id_slice_attributes(tomo_id, slice_num) -> Union[pd.DataFrame, None]:
@@ -158,6 +164,87 @@ def rescale_letterbox():
     df.to_csv(config.DENORMALIZED_RESULTS, index=False)
 
 
+def generate_filename(tomo_id: str, slice_idx: float) -> str:
+    """Generate a filename based on tomo_id and slice index."""
+    # tomo_0a8f05_slice_0000.jpg
+    # tomo_0a8f05_slice_0299.jpg
+    if int(slice_idx) < 0:
+        return ""
+
+    return f"{tomo_id}_slice_{int(slice_idx):04d}.jpg"
+
+
+def generate_absolute_path(tomo_id: str, slice_idx: float) -> str:
+    """Generate a filename based on tomo_id and slice index."""
+    # /data/horse/ws/kein254g-team_project/train/tomo_0a8f05/slice_0000.jpg
+    # /data/horse/ws/kein254g-team_project/train/tomo_0a8f05/slice_0299.jpg
+    if int(slice_idx) < 0:
+        return ""
+
+    return os.path.join(config.TRAIN_DATASET_HPC_DIR, tomo_id, f"slice_{int(slice_idx):04d}.jpg")
+
+
+def generate_absolute_paths__for_tomo_id(tomo_id: str):
+    """Generate filenames for all slices of a given tomo_id."""
+    z_length = find_z_axis_length(tomo_id)
+    if z_length == "":
+        return []
+    filenames = [
+        # os.path.join(config.TRAIN_DATASET_HPC_DIR, tomo_id, f"slice_{i:04d}.jpg")
+        generate_absolute_path(tomo_id, i)
+        for i in range(int(z_length))
+    ]
+
+    return filenames
+
+
+def add_absolute_paths_to_csv():
+    "Read csv train and generate absolute paths for each tomo_id"
+
+    df = pd.read_csv(config.TRAIN_CSV_PATH)
+    df["absolute_path"] = df.apply(
+        lambda row: generate_absolute_path(row["tomo_id"], row["Motor axis 0"]), axis=1
+    )
+
+    # append absolute path column to csv in same data frame df
+    df.to_csv(config.TRAIN_CSV_PATH, index=False)
+
+
+def target_file_paths(tomo_id: str):
+    """Generate target file paths for YOLO format based on tomo_id."""
+    z_length = find_z_axis_length(tomo_id)
+    if z_length == "":
+        return []
+    target_paths = [
+        os.path.join(config.YOLO_TRAIN_FORMAT_DIR, generate_filename(tomo_id, i))
+        for i in range(int(z_length))
+    ]
+    return target_paths
+
+
+def move_files_to_yolo_format():
+    """Move files to YOLO format directory structure."""
+    # This function is a placeholder and needs to be implemented based on specific requirements.
+    tomos = find_all_train_tomo_ids()
+    count = 0
+
+    for tomo_id in tomos:
+        src_files = generate_absolute_paths__for_tomo_id(tomo_id)
+        dst_files = target_file_paths(tomo_id)
+        for src, dst in zip(src_files, dst_files):
+            dst_path = Path(dst)
+
+            if dst_path.exists():
+                print(f"Skipping {dst} as it already exists.")
+                continue
+
+            dst_path.parent.mkdir(parents=True, exist_ok=True)  # klasörü yoksa oluştur
+            shutil.copy(src, dst)  # taşıma istiyorsan copy yerine move yaz
+            print(f"{src} -> {dst}")
+        count += 1
+        print(f"Processed {count}/{len(tomos)}: {tomo_id}")
+
+
 if __name__ == "__main__":
     # print(find_all_tomo_id_attributes("tomo_00e047"))
-    print(train_test_validation_split())
+    print(move_files_to_yolo_format())

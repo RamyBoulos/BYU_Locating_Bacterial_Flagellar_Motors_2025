@@ -62,3 +62,8 @@ NMS_RESULTS_CSV = os.path.join(PROJECT_ROOT, "data", "raw", "nms_results.csv")
 
 
 RTDETR_RESULT_LABELS = os.path.join(RTDETR_RESULT, "labels")
+
+# /data/horse/ws/kein254g-team_project/dataset/images/train
+YOLO_TRAIN_FORMAT_DIR = os.path.join(WORKSPACE_ROOT, "dataset", "images", "train")
+YOLO_VAL_FORMAT_DIR = os.path.join(WORKSPACE_ROOT, "dataset", "images", "val")
+YOLO_TEST_FORMAT_DIR = os.path.join(WORKSPACE_ROOT, "dataset", "images", "test")
