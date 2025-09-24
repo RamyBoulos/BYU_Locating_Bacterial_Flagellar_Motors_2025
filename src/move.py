@@ -7,6 +7,7 @@ from src.utils.utills import (
     find_all_tomo_ids,
     generate_absolute_paths__for_tomo_id,
     target_file_paths,
+    generate_all_labels_txt
 )
 
 
@@ -33,5 +34,8 @@ def move_files_to_yolo_format(type: DatasetType = DatasetType.TRAIN):
 
 
 if __name__ == "__main__":
-    move_files_to_yolo_format(type=DatasetType.VALID)
+    #move_files_to_yolo_format(type=DatasetType.TRAIN)
+    #move_files_to_yolo_format(type=DatasetType.VALID)
     move_files_to_yolo_format(type=DatasetType.TEST)
+    generate_all_labels_txt()
+    

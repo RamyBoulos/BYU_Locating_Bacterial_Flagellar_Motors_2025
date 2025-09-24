@@ -68,3 +68,8 @@ YOLO_TRAIN_FORMAT_DIR = os.path.join(WORKSPACE_ROOT, "dataset", "images", "train
 YOLO_VAL_FORMAT_DIR = os.path.join(WORKSPACE_ROOT, "dataset", "images", "val")
 YOLO_TEST_FORMAT_DIR = os.path.join(WORKSPACE_ROOT, "dataset", "images", "test")
 DATASET_DIR = os.path.join(WORKSPACE_ROOT, "dataset")
+
+LABELS_PATH = os.path.join(WORKSPACE_ROOT, "dataset", "labels")
+TRAIN_LABELS_TXT_PATH = os.path.join(LABELS_PATH, "train")
+VAL_LABELS_TXT_PATH = os.path.join(LABELS_PATH, "val")
+TEST_LABELS_TXT_PATH = os.path.join(LABELS_PATH, "test")
