@@ -73,3 +73,6 @@ LABELS_PATH = os.path.join(WORKSPACE_ROOT, "dataset", "labels")
 TRAIN_LABELS_TXT_PATH = os.path.join(LABELS_PATH, "train")
 VAL_LABELS_TXT_PATH = os.path.join(LABELS_PATH, "val")
 TEST_LABELS_TXT_PATH = os.path.join(LABELS_PATH, "test")
+
+RTDETR_TRAINING_RESULT = os.path.join(WORKSPACE_ROOT, "rtdetr_training_result", "exp2")
+YOLO_TRAINING_RESULT = os.path.join(WORKSPACE_ROOT, "yolo_training_result", "exp2")

@@ -6,3 +6,7 @@ class DatasetType(Enum):
     VALID = "valid"
     TEST = "test"
     ALL = "all"
+
+class ModelType(Enum):
+    RTDETR = "RTDETR"
+    YOLO = "YOLO"
