@@ -27,3 +27,6 @@ srun python3 -m src.move
 # İstersen diğer setler arka arkaya:
 # srun python -m src.move --dataset valid
 # srun python -m src.move --dataset test
+
+# sbatch ./src/move_cpu.sbatch  for submission
+# scancel JOBID  for cancellation

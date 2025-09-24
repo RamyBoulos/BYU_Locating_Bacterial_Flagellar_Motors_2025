@@ -201,3 +201,5 @@ preprocessed_data/
 data/
 yolo*.pt
 *.pt
+
+logs/

@@ -30,5 +30,5 @@ srun python3 -m src.generate_labels
 # srun python -m src.move --dataset valid
 # srun python -m src.move --dataset test
 
-# sbatch ./src/generate_labels_cpu.sbatch  for submission
+# sbatch ./jobs/generate_labels_cpu.sbatch  for submission
 # scancel JOBID  for cancellation
