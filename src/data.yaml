@@ -1,6 +1,7 @@
 names:
 - motor
 nc: 1
-path: /data/horse/ws/kein254g-team_project/data/yolo
+path: /data/horse/ws/kein254g-team_project/dataset
+test: images/test
 train: images/train
 val: images/val

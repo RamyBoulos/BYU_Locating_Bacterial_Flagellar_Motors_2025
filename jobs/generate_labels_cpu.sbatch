@@ -4,7 +4,7 @@
 #SBATCH --cpus-per-task=8
 #SBATCH --time=01:00:00
 #SBATCH --job-name=generate_labels.py
-#SBATCH --mail-type=start,end
+#SBATCH --mail-type=BEGIN,END,FAIL
 #SBATCH --mail-user=kerem.inci@mailbox.tu-dresden.de
 #SBATCH --output=logs/%x_%j.out   # stdout
 #SBATCH --error=logs/%x_%j.err    # stderr

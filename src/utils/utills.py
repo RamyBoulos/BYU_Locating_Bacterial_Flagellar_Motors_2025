@@ -253,7 +253,8 @@ def fetch_dataset_directory(type: DatasetType = DatasetType.TRAIN) -> str:
         raise ValueError(f"Unknown dataset type: {type}")
     return dir_path
 
-def get_labels_directory(type: DatasetType = DatasetType.TRAIN) -> str:
+
+def get_labels_directory(type: DatasetType) -> str:
     dir_path = ""
     if type == DatasetType.TRAIN:
         dir_path = config.TRAIN_LABELS_TXT_PATH
@@ -265,6 +266,7 @@ def get_labels_directory(type: DatasetType = DatasetType.TRAIN) -> str:
         raise ValueError(f"Unknown dataset type: {type}")
     return dir_path
 
+
 def get_positive_tomo_id_slices(tomo_id: str):
     # fix here
     df = pd.read_csv(config.TRAIN_LABELS_PATH)
@@ -272,70 +274,52 @@ def get_positive_tomo_id_slices(tomo_id: str):
     positive_slices = tomo_id_df[tomo_id_df["Motor axis 0"] > 0]["Motor axis 0"].tolist()
     return positive_slices
 
+def get_negative_tomo_id_slices(tomo_id: str):
+    all_tomo_id_slices = get_all_tomo_id_slices(tomo_id)
+    positive_slices = get_positive_tomo_id_slices(tomo_id)
+    negative_slices = list(set(all_tomo_id_slices) - set(positive_slices))
+    return negative_slices
+
 def get_all_tomo_id_slices(tomo_id: str):
     slice_length = find_z_axis_length(tomo_id)
     generate_filename(tomo_id, slice_length)
     return [i for i in range(slice_length)]
 
-def get_negative_tomo_id_slices(tomo_id: str):
-    attributes = find_all_tomo_id_attributes(tomo_id)
-    if attributes is None or attributes.empty:
-        return []
-    negative_slices = attributes[attributes["Motor axis 0"] < 0]["Motor axis 0"].tolist()
-    return negative_slices
+def copy_files(positive_tomo_id_slices , negative_tomo_id_slices, tomo_id: str , type: DatasetType):
+    dest_dir = fetch_dataset_directory(type)
+    for slice_idx in positive_tomo_id_slices:
+        print(generate_absolute_path(tomo_id, slice_idx))
+        src = generate_absolute_path(tomo_id, slice_idx)
+        dst = os.path.join(dest_dir, generate_filename(tomo_id, slice_idx))
+      
+        dst_path = Path(dst)
 
-def generate_labels_txt(type : DatasetType):
-    df = get_csv_data_frame(type)
-    labels_dir = get_labels_directory(type)
-    os.makedirs(labels_dir, exist_ok=True)
+        if dst_path.exists():
+            print(f"Skipping {dst} as it already exists.")
+            continue
 
-    # get all tomo_ids in the dataframe
-    tomo_ids = df['tomo_id'].unique()
-    print(f"Found {len(tomo_ids)} unique tomo_ids in the {type.value} dataset.")
-
-    for tomo_id in tomo_ids:
-        slice_length = find_z_axis_length(tomo_id)
-        # generate_filename(tomo_id, slice_length)
-        file_names = [generate_filename(tomo_id, i) for i in range(slice_length)]
-        file_names = [f.replace('.jpg', '.txt') for f in file_names]
-        file_paths = [os.path.join(labels_dir, f) for f in file_names]
-        print(f"Generating labels for tomo_id: {tomo_id} with {len(file_names)} slices.")
-
-        # now create empty txt files for each file_paths
-        for file_path in file_paths:
-            with open(file_path, 'w') as f:
-                pass  # create an empty file
-        print(f"Finished generating empty labels for tomo_id: {tomo_id}")
-        positive_tomo_id_slices = get_positive_tomo_id_slices(tomo_id)
-        for slice_idx in positive_tomo_id_slices:
-            file_name = generate_filename(tomo_id, slice_idx).replace('.jpg', '.txt')
-            file_path = os.path.join(labels_dir, file_name)
-            attributes = find_tomo_id_slice_attributes(tomo_id, slice_idx)
-            if attributes is None or attributes.empty:
-                print(f"No attributes found for tomo_id: {tomo_id}, slice_idx: {slice_idx}. Skipping...")
-                continue
-            width = attributes.iloc[0]["Array shape (axis 2)"]
-            height = attributes.iloc[0]["Array shape (axis 1)"]
-            x_center = attributes.iloc[0]["Motor axis 2"]
-            y_center = attributes.iloc[0]["Motor axis 1"]
-            # convert to yolo format
-            x_center /= width
-            y_center /= height
-            # fix width and height normalization later
-            BOX_LENGTH = 20  # pixels
-            width = BOX_LENGTH / width
-            height = BOX_LENGTH / height
-
-            with open(file_path, 'w') as f:
-                f.write(f"0 {x_center} {y_center} {width} {height}\n")
-        print(f"Finished generating positive labels for tomo_id: {tomo_id}")
+        dst_path.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy(src, dst)
+        print(f"Copy {src} to {dst}")
 
 
-def generate_all_labels_txt():
-    "Generate txt file with all labels in the dataset for YOLO/RT-DETR training"
-    for type in [DatasetType.TRAIN, DatasetType.VALID, DatasetType.TEST]:
-        generate_labels_txt(type)
-        
+    for slice_idx in negative_tomo_id_slices:
+        print(generate_absolute_path(tomo_id, slice_idx))
+        src = generate_absolute_path(tomo_id, slice_idx)
+        dst = os.path.join(dest_dir, generate_filename(tomo_id, slice_idx))
+
+        dst_path = Path(dst)
+
+        if dst_path.exists():
+            print(f"Skipping {dst} as it already exists.")
+            continue
+
+        dst_path.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy(src, dst)
+        print(f"Copy {src} to {dst}")
+
+    return 
+
 
 def move_files_to_yolo_format(type: DatasetType = DatasetType.TRAIN):
     """Move files to YOLO format directory structure."""
