@@ -16,13 +16,10 @@ print(f"Project root set to: {project_root}")
 
 from src import config 
 
-DATA_ROOT = os.getenv("DATA_ROOT", str(config.DATASET_DIR))
-print(f"Using DATA_ROOT: {DATA_ROOT}")
 data_cfg = {
-    "path": DATA_ROOT,                 # <<< now points to staged copy
+    "path": str(config.DATASET_DIR),                 
     "train": "images/train",
     "val":   "images/val",
-    "test":  "images/test",
     "nc": 1,
     "names": ["motor"],
 }
@@ -30,73 +27,69 @@ data_cfg = {
 with open(f"{config.SRC}/data.yaml", "w") as f:
     yaml.dump(data_cfg, f)
 
+print(f"Dataset directory: {config.DATASET_DIR}")
 print(f"Data configuration saved to {config.SRC}/data.yaml")
-# is cuda available
 print("CUDA available:", torch.cuda.is_available())
 
 
-def _suggest_workers():
-    # Respect SLURM, avoid oversubscription; YOLO uses one "workers" value for all loaders
-    cpus = int(os.getenv("SLURM_CPUS_PER_TASK", "6"))
-    print(f"SLURM_CPUS_PER_TASK={cpus}")
-    # Leave 1 CPU for Python/CUDA, split roughly across train/val internally
-    return max(1, min(6, max(1, cpus - 1) // 2))
 
 def train_model(type: ModelType):
-    workers = _suggest_workers()
-    print(f"Using workers={workers}")
     device_arg = 0 if torch.cuda.is_available() else "cpu"  # single-GPU job
 
     if type == ModelType.RTDETR:
-        model = RTDETR("rtdetr-l.pt") # rtdetr-l.pt for experimenting, rtdetr-x.pt for training
+        model = RTDETR("rtdetr-x.pt") # rtdetr-l.pt for experimenting, rtdetr-x.pt for training
         project_path = config.RTDETR_TRAINING_RESULT
-        project_name = "motor_rtdetr_l_1024"
+        project_name = "motor_rtdetr_x_1024"
     elif type == ModelType.YOLO:
-        model = YOLO("yolov8n.pt")  # yolov8n.pt for experimenting, yolov8x.pt for training
+        model = YOLO("yolov8m.pt")  # yolov8n.pt for experimenting, yolov8x.pt for training
         project_path = config.YOLO_TRAINING_RESULT
         project_name = "motor_yolo_1024"
 
     results = model.train(
-        data=f"{config.SRC}/data.yaml",
-        project=project_path,
-        name=project_name,
+    data=f"{config.SRC}/data.yaml",
+    project=project_path,
+    name=project_name,
 
-        # --- runtime sizing (tune to fit your SLURM time) ---
-        epochs=2,                # increase later; resume=True for continuation
-        batch=8,                # was 16; slightly lower to avoid timeouts
-        imgsz=896,             # 1024x1024 for final; 896 for faster iteration
+    # --- optimization ---
+    optimizer="AdamW",
+    lr0=1e-4, lrf=0.1,           # start higher than 1e-5; 2e-4 is also a good try
+    cos_lr=True, warmup_epochs=3,
 
-        # --- performance knobs ---
-        workers=6,         # <<< key fix for your warning
-        device=device_arg,
-        cache="disk",            # safer on shared clusters than RAM; try "ram" if fits
-        rect=True,
-        multi_scale=False,
+    # --- schedule ---
+    epochs=150, patience=20,     # shorter patience is usually enough
 
-        # --- optim schedule ---
-        optimizer="AdamW",
-        lr0=1e-4,
-        lrf=0.1,
-        cos_lr=True,
-        warmup_epochs=3,
-        patience=30,
+    # --- batch / io ---
+    batch=16,
+    imgsz=1024,
+    device="cuda" if torch.cuda.is_available() else "cpu",
+    cache="ram",
+    workers=8,                   # adjust to node; <= #CPU cores
 
-        # --- data/aug (kept modest; mosaic/mixup off for stability) ---
-        augment=True,
-        hsv_h=0.0, hsv_s=0.1, hsv_v=0.2,
-        degrees=0.0, translate=0.05, scale=0.10, shear=0.0, perspective=0.0,
-        fliplr=0.5, flipud=0.5,
-        mosaic=0.0, mixup=0.0, cutmix=0.0,
+    # --- loss weights (tiny-object bias) ---
+    box=9.0, cls=0.75, dfl=1.5,
 
-        # --- logging/saving ---
-        save=True,
-        save_period=1,
-        verbose=True,
-        # deterministic=False,  # optional Ultralytics flag (8.2+); we already disabled via torch
-    )
+    # --- augmentation (gentle for tiny targets) ---
+    augment=True,
+    hsv_h=0.0, hsv_s=0.05, hsv_v=0.1,  # set to 0 if images are grayscale
+    degrees=10.0, translate=0.05, scale=0.10, shear=0.0, perspective=0.0,
+    fliplr=0.5, flipud=0.5,
+
+    # --- mosaic/mix ---
+    mosaic=0.0, mixup=0.0, cutmix=0.0,  # tiny single-object: keep off
+
+    # --- batching/layout ---
+    rect=False,                 # IMPORTANT: more diversity during train
+    multi_scale=False,
+
+    # --- logging/saving ---
+    save_period=1,              # reduce disk churn
+    verbose=True, plots=True,
+    seed=42
+)
+    print(results)
     return results
 
 
 if __name__ == "__main__":
-    #train_model(type=ModelType.RTDETR)
-    train_model(type=ModelType.YOLO)
+    train_model(type=ModelType.RTDETR)
+    #train_model(type=ModelType.YOLO)

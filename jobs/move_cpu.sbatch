@@ -6,6 +6,8 @@
 #SBATCH --job-name=move.py
 #SBATCH --mail-type=BEGIN,END,FAIL
 #SBATCH --mail-user=kerem.inci@mailbox.tu-dresden.de
+#SBATCH --output=logs/%x_%j.out
+#SBATCH --error=logs/%x_%j.err
 
 export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
 

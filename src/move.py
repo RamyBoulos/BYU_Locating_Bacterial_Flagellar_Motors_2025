@@ -1,6 +1,8 @@
 from src.types.types import DatasetType
 import os
 import numpy as np
+import sys
+
 
 from src.utils.utills import (
     get_csv_data_frame,
@@ -11,6 +13,15 @@ from src.utils.utills import (
     find_tomo_id_slice_attributes,
     copy_files
 )
+
+# Add project root to system path to allow src module imports
+project_root = os.path.abspath(os.path.join(os.getcwd()))
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+
+print(f"Project root set to: {project_root}")
+
+from src import config 
 
 
 def generate_labels_txt(type: DatasetType):
@@ -31,7 +42,7 @@ def generate_labels_txt(type: DatasetType):
         # 3:1 sampling 1 positive 3 negative
         sampled_negative_slices = np.random.choice(
                 negative_tomo_id_slices,
-                size=len(positive_tomo_id_slices) * 3,
+                size=len(positive_tomo_id_slices) * 1,
                 replace=False,
             )
         
@@ -65,21 +76,21 @@ def generate_labels_txt(type: DatasetType):
                     f"No attributes found for tomo_id: {tomo_id}, slice_idx: {slice_idx}. Skipping..."
                 )
                 continue
-            width = attributes.iloc[0]["Array shape (axis 2)"]
-            height = attributes.iloc[0]["Array shape (axis 1)"]
+            image_width = attributes.iloc[0]["Array shape (axis 2)"]
+            image_height = attributes.iloc[0]["Array shape (axis 1)"]
             x_center = attributes.iloc[0]["Motor axis 2"]
             y_center = attributes.iloc[0]["Motor axis 1"]
-            
-            x_center /= width
-            y_center /= height
 
-            # fix width and height normalization later
-            BOX_LENGTH = 20  # pixels
-            width = BOX_LENGTH / width
-            height = BOX_LENGTH / height
+            x_center = x_center / image_width
+            y_center = y_center / image_height
+
+            # fix width and height normalization later , should i change it correspoinding to different image width and height
+            box_width =  config.BOX_LENGTH / image_width
+            box_height = config.BOX_LENGTH / image_height
 
             with open(file_path, "w") as f:
-                f.write(f"0 {x_center} {y_center} {width} {height}\n")
+                # f"0 {cx:.6f} {cy:.6f} {bw:.6f} {bh:.6f}"
+                f.write(f"0 {x_center:.6f} {y_center:.6f} {box_width:.6f} {box_height:.6f}")
 
         print(f"Finished generating positive labels for tomo_id: {tomo_id}")
 

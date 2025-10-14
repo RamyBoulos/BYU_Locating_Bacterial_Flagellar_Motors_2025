@@ -113,7 +113,7 @@ def find_tomo_id_slice_attributes(tomo_id, slice_num) -> Union[pd.DataFrame, Non
     return filtered_df
 
 
-def find_width_height(tomo_id, slice_num):
+def find_width_height(tomo_id, slice_num) -> Union[tuple[float, float], tuple[None, None]]:
     """Find width and height for a given tomo_id and slice_num."""
     attributes = find_tomo_id_slice_attributes(tomo_id, slice_num)
 
@@ -124,7 +124,7 @@ def find_width_height(tomo_id, slice_num):
     width = attributes.iloc[0]["Array shape (axis 2)"]
     height = attributes.iloc[0]["Array shape (axis 1)"]
     print(f"Width: {width}, Height: {height}")
-    return width, height
+    return float(width), float(height)
 
 
 def parse_txt(file_path, f):

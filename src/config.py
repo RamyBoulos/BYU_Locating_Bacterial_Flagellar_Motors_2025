@@ -20,6 +20,17 @@ TRAIN_LABELS_PATH = os.path.join(PROJECT_ROOT, "data", "raw", "train_labels.csv"
 SAMPLED_LABELS_PATH = os.path.join(SAMPLED_DATA_DIR, "sampled_train_labels.csv")
 DENORMALIZED_RESULTS = os.path.join(PROJECT_ROOT, "data", "raw", "denormalized_results.csv")
 
+DENORMALIZED_RESULTS_RTDETR = os.path.join(PROJECT_ROOT, "data", "raw", "rtdetr_coordinates.csv")
+DENORMALIZED_RESULTS_YOLO = os.path.join(PROJECT_ROOT, "data", "raw", "yolo_coordinates.csv")
+
+
+NMS_RESULTS_CSV_RTDETR = os.path.join(PROJECT_ROOT, "data", "raw", "nms_results_rtdetr.csv")
+NMS_RESULTS_CSV_YOLO = os.path.join(PROJECT_ROOT, "data", "raw", "nms_results_yolo.csv")
+ 
+# PREDICTIONS_LABELS = os.path.join(PROJECT_ROOT, "data", "raw", "predictions_labels.csv")
+RTDETR_PREDICTIONS_LABELS = os.path.join(WORKSPACE_ROOT, "rtdetr_predictions", "predict", "labels")
+YOLO_PREDICTIONS_LABELS = os.path.join(WORKSPACE_ROOT, "rtdetr_predictions", "predict", "labels")
+
 
 TRAIN_CSV_PATH = os.path.join(PROJECT_ROOT, "data", "raw", "train.csv")
 VALIDATION_CSV_PATH = os.path.join(PROJECT_ROOT, "data", "raw", "validation.csv")
@@ -76,3 +87,6 @@ TEST_LABELS_TXT_PATH = os.path.join(LABELS_PATH, "test")
 
 RTDETR_TRAINING_RESULT = os.path.join(WORKSPACE_ROOT, "rtdetr_training_result", "exp2")
 YOLO_TRAINING_RESULT = os.path.join(WORKSPACE_ROOT, "yolo_training_result", "exp2")
+
+
+BOX_LENGTH = 64

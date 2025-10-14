@@ -1,9 +1,9 @@
-
-import sys
-from typing import Optional, Tuple
-from dataclasses import dataclass, field
-import numpy as np
 import logging
+import sys
+from types import SimpleNamespace
+from typing import Optional
+
+import numpy as np
 from scipy.optimize import linear_sum_assignment
 from scipy.spatial.distance import cdist
 
@@ -15,28 +15,6 @@ console_handler.setLevel(logging.INFO)
 formatter = logging.Formatter("%(levelname)s:%(name)s:%(message)s")
 console_handler.setFormatter(formatter)
 log.addHandler(console_handler)
-
-
-@dataclass
-class EvalResult:
-
-    tp: int = 0
-    fp: int = 0
-    fn: int = 0
-
-    precision: float = 0.0
-    recall: float = 0.0
-    f1: float = 0.0
-    accuracy: float = 0.0
-
-    dist: np.ndarray = field(default_factory=lambda: np.array([]))
-    mean_dist: float = 0.0
-
-    panoptic_quality: float = 0.0
-
-    false_negatives: Tuple[int, ...] = field(default_factory=tuple)
-    false_positives: Tuple[int, ...] = field(default_factory=tuple)
-    matched_pairs: Tuple[Tuple[int, int], ...] = field(default_factory=tuple)
 
 
 def points_matching(
@@ -68,7 +46,7 @@ def points_matching(
 
     i, j = i[valid], j[valid]
 
-    res = EvalResult()
+    res = SimpleNamespace()
 
     tp = len(i)
     fp = len(p2) - tp
@@ -85,11 +63,11 @@ def points_matching(
     res.recall = tp_eps / (tp_eps + fn) if tp_eps > 0 else 0
     res.f1 = (2 * tp_eps) / (2 * tp_eps + fp + fn) if tp_eps > 0 else 0
     res.dist = np.sqrt(D[i, j])
-    res.mean_dist = float(np.mean(res.dist)) if len(res.dist) > 0 else 0.0
+    res.mean_dist = np.mean(res.dist) if len(res.dist) > 0 else 0
 
     pq_num = np.sum(cutoff_distance - res.dist) / cutoff_distance
     pq_den = tp_eps + fp / 2 + fn / 2
-    res.panoptic_quality = float(pq_num / pq_den) if tp_eps > 0 else 0.0
+    res.panoptic_quality = pq_num / pq_den if tp_eps > 0 else 0
 
     res.false_negatives = tuple(set(range(len(p1))).difference(set(i)))
     res.false_positives = tuple(set(range(len(p2))).difference(set(j)))
@@ -123,13 +101,13 @@ def points_matching_dataset(
     )
 
     if by_image:
-        res: EvalResult = EvalResult()
+        res = dict()
         for k, v in vars(stats[0]).items():
             if np.isscalar(v):
-                setattr(res, k, float(np.mean([vars(s)[k] for s in stats])))
-        return res
+                res[k] = np.mean([vars(s)[k] for s in stats])
+        return SimpleNamespace(**res)
     else:
-        res = EvalResult()
+        res = SimpleNamespace()
         res.tp = 0
         res.fp = 0
         res.fn = 0
@@ -149,6 +127,6 @@ def points_matching_dataset(
         pq_num = np.sum(cutoff_distance - dists) / cutoff_distance
         pq_den = tp_eps + res.fp / 2 + res.fn / 2
 
-        res.panoptic_quality = float(pq_num / pq_den) if tp_eps > 0 else 0.0
-        res.mean_dist = float(np.mean(dists)) if len(dists) > 0 else 0.0
+        res.panoptic_quality = pq_num / pq_den if tp_eps > 0 else 0
+        res.mean_dist = np.mean(dists) if len(dists) > 0 else 0
         return res

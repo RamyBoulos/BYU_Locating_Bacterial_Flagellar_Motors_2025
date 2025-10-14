@@ -1,7 +1,6 @@
 names:
 - motor
 nc: 1
-path: /data/horse/ws/kein254g-team_project/dataset
-test: images/test
+path: /data/horse/ws/kein254g-team_project/dataset2
 train: images/train
 val: images/val
