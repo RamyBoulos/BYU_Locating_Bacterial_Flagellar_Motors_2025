@@ -1,3 +1,4 @@
+# type: ignore
 import logging
 import sys
 from types import SimpleNamespace

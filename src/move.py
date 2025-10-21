@@ -1,9 +1,13 @@
-from src.types.types import DatasetType
 import os
 import numpy as np
 import sys
 
-
+# Add project root to system path to allow src module imports
+project_root = os.path.abspath(os.path.join(os.getcwd()))
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+    
+from src.types.types import DatasetType
 from src.utils.utills import (
     get_csv_data_frame,
     generate_filename,
@@ -11,7 +15,10 @@ from src.utils.utills import (
     get_negative_tomo_id_slices,
     get_positive_tomo_id_slices,
     find_tomo_id_slice_attributes,
-    copy_files
+    copy_files,
+    find_all_tomo_ids,
+    get_labels_paths,
+
 )
 
 # Add project root to system path to allow src module imports
@@ -94,8 +101,55 @@ def generate_labels_txt(type: DatasetType):
 
         print(f"Finished generating positive labels for tomo_id: {tomo_id}")
 
+def generate_test_labels_txt():
+    "Generate txt file with all labels in the dataset for YOLO/RT-DETR training"
+    tomoIds = find_all_tomo_ids(DatasetType.TEST)
+
+    for tomoId in tomoIds:
+        print(f"Generating labels for tomo_id: {tomoId}")
+        positive_tomo_id_slices = get_positive_tomo_id_slices(tomoId)
+        negative_tomo_id_slices = get_negative_tomo_id_slices(tomoId)
+
+        file_paths_negative = get_labels_paths(tomoId, DatasetType.TEST, negative_tomo_id_slices)
+        file_paths_positive = get_labels_paths(tomoId, DatasetType.TEST, positive_tomo_id_slices)
+
+        for file_path in file_paths_negative:
+            with open(file_path, "w") as f:
+                pass  # create an empty file
+        print(f"Finished generating empty labels for tomo_id: {tomoId}")
+
+        # lambda for positive_tomo_id_slices
+        # copy_files(positive_tomo_id_slices, negative_tomo_id_slices, tomoId, DatasetType.TEST)
+        # src = generate_absolute_path(tomoId)
+
+        for slice_idx, file_path in zip(positive_tomo_id_slices, file_paths_positive):
+            attributes = find_tomo_id_slice_attributes(tomoId, slice_idx)
+            if attributes is None or attributes.empty:
+                print(
+                    f"No attributes found for tomo_id: {tomoId}, slice_idx: {slice_idx}. Skipping..."
+                )
+                continue
+            width = attributes.iloc[0]["Array shape (axis 2)"]
+            height = attributes.iloc[0]["Array shape (axis 1)"]
+            x_center = attributes.iloc[0]["Motor axis 2"]
+            y_center = attributes.iloc[0]["Motor axis 1"]
+
+            x_center /= width
+            y_center /= height
+
+            # fix width and height normalization later
+            BOX_LENGTH = 20  # pixels
+            width = BOX_LENGTH / width
+            height = BOX_LENGTH / height
+
+            with open(file_path, "w") as f:
+                f.write(f"0 {x_center} {y_center} {width} {height}\n")
+
+        print(f"Finished generating positive labels for tomo_id: {tomoId}")
 
 if __name__ == "__main__":
+    print("Generating YOLO format labels...")
+   # generate_test_labels_txt()
     generate_labels_txt(DatasetType.TRAIN)
     generate_labels_txt(DatasetType.VALID)
-    generate_labels_txt(DatasetType.TEST)
+   # generate_labels_txt(DatasetType.TEST)

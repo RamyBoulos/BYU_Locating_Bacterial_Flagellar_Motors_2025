@@ -2,13 +2,13 @@
 #SBATCH --nodes=1              # request 1 node
 #SBATCH --cpus-per-task=6      # use 6 threads per task
 #SBATCH --gres=gpu:1          # request 1 GPU per node
-#SBATCH --time=01:00:00 
+#SBATCH --time=05:00:00 
 #SBATCH --mem=32GB             
 #SBATCH --mail-type=BEGIN,END,FAIL
 #SBATCH --mail-user=kerem.inci@mailbox.tu-dresden.de
 #SBATCH --output=logs/%x_%j.out
 #SBATCH --error=logs/%x_%j.err
-#SBATCH --job-name=train.py
+#SBATCH --job-name=inference.py
 
 
 
@@ -20,4 +20,4 @@ mkdir -p logs
 srun python3 -m src.inference
 
 # submission of job
-# sbatch ./jobs/train_gpu.sbatch 
+# sbatch ./jobs/inference.sbatch

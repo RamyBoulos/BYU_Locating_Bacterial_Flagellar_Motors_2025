@@ -16,8 +16,6 @@ tqdm
 # Machine learning
 scikit-learn
 
-# Data augmentation
-albumentations
 
 # Configuration management
 pyyaml

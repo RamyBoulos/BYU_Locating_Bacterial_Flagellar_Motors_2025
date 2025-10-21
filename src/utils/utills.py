@@ -17,6 +17,7 @@ from pathlib import Path
 from typing import Union
 import pandas as pd
 import shutil
+from typing import List, Optional
 
 from src.types.types import DatasetType
 
@@ -52,6 +53,21 @@ def find_all_predicted_tomo_id_attributes(tomo_id: str) -> Union[pd.DataFrame, N
 
     return filtered_df
 
+def get_labels_paths(
+    tomoId: str, type: DatasetType, slices: Optional[List[int]] = None
+) -> List[str]:
+    labels_dir = get_labels_directory(type)
+
+    if slices is None:
+        tomoIdList = get_all_tomo_id_slices(tomoId)
+    else:
+        tomoIdList = slices
+
+    file_names = [generate_filename(tomoId, i) for i in tomoIdList]
+    file_names = [f.replace(".jpg", ".txt") for f in file_names]
+    file_paths = [os.path.join(labels_dir, f) for f in file_names]
+
+    return file_paths
 
 def find_all_tomo_ids(type: DatasetType) -> list:
     """Find all unique tomo_ids in the training labels."""

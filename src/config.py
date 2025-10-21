@@ -23,7 +23,6 @@ DENORMALIZED_RESULTS = os.path.join(PROJECT_ROOT, "data", "raw", "denormalized_r
 DENORMALIZED_RESULTS_RTDETR = os.path.join(PROJECT_ROOT, "data", "raw", "rtdetr_coordinates.csv")
 DENORMALIZED_RESULTS_YOLO = os.path.join(PROJECT_ROOT, "data", "raw", "yolo_coordinates.csv")
 
-
 NMS_RESULTS_CSV_RTDETR = os.path.join(PROJECT_ROOT, "data", "raw", "nms_results_rtdetr.csv")
 NMS_RESULTS_CSV_YOLO = os.path.join(PROJECT_ROOT, "data", "raw", "nms_results_yolo.csv")
  

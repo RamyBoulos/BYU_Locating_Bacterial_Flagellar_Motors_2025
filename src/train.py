@@ -34,14 +34,13 @@ print("CUDA available:", torch.cuda.is_available())
 
 
 def train_model(type: ModelType):
-    device_arg = 0 if torch.cuda.is_available() else "cpu"  # single-GPU job
 
     if type == ModelType.RTDETR:
         model = RTDETR("rtdetr-x.pt") # rtdetr-l.pt for experimenting, rtdetr-x.pt for training
         project_path = config.RTDETR_TRAINING_RESULT
         project_name = "motor_rtdetr_x_1024"
     elif type == ModelType.YOLO:
-        model = YOLO("yolov8m.pt")  # yolov8n.pt for experimenting, yolov8x.pt for training
+        model = YOLO("yolov8x.pt")  # yolov8n.pt for experimenting, yolov8x.pt for training
         project_path = config.YOLO_TRAINING_RESULT
         project_name = "motor_yolo_1024"
 
@@ -91,5 +90,5 @@ def train_model(type: ModelType):
 
 
 if __name__ == "__main__":
-    train_model(type=ModelType.RTDETR)
-    #train_model(type=ModelType.YOLO)
+    #train_model(type=ModelType.RTDETR)
+    train_model(type=ModelType.YOLO)
