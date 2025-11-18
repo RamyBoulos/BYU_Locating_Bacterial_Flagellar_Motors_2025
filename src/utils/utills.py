@@ -19,7 +19,7 @@ import pandas as pd
 import shutil
 from typing import List, Optional
 
-from src.types.types import DatasetType
+from src.types.types import DatasetType, ModelType
 
 # Ensure repository root is on sys.path so `src` is importable
 repo_root = Path(__file__).resolve().parents[2]
@@ -68,6 +68,22 @@ def get_labels_paths(
     file_paths = [os.path.join(labels_dir, f) for f in file_names]
 
     return file_paths
+
+def get_test_files_path():
+
+    test_images = config.YOLO_TEST_FORMAT_DIR
+    test_files = glob.glob(os.path.join(test_images, "*.jpg"))
+    print(f"Found {len(test_files)} test files.")
+    return test_files
+
+
+def get_tomo_id_and_slice_id_from_image_path(image_path: str):
+    stem = Path(image_path).stem
+    parts = stem.split("_slice_")
+    tomo_id = parts[0]  # "tomo_675583"
+    slice_id = int(parts[1])  # "0187" # -> tomo_675583_slice_0187
+    return tomo_id, slice_id
+
 
 def find_all_tomo_ids(type: DatasetType) -> list:
     """Find all unique tomo_ids in the training labels."""
@@ -127,6 +143,19 @@ def find_tomo_id_slice_attributes(tomo_id, slice_num) -> Union[pd.DataFrame, Non
         return None  # Return None if tomo_id or slice_num not found
 
     return filtered_df
+
+def find_coordinates(tomo_id, slice_num) -> Union[tuple[float, float], tuple[None, None]]:
+    """Find x and y coordinates for a given tomo_id and slice_num."""
+    attributes = find_tomo_id_slice_attributes(tomo_id, slice_num)
+
+    if attributes is None or attributes.empty:
+        print(f"No attributes found for tomo_id: {tomo_id}, slice_num: {slice_num}")
+        return None, None
+
+    x_coord = attributes.iloc[0]["Origin (axis 2)"]
+    y_coord = attributes.iloc[0]["Origin (axis 1)"]
+    print(f"x_coord: {x_coord}, y_coord: {y_coord}")
+    return float(x_coord), float(y_coord)
 
 
 def find_width_height(tomo_id, slice_num) -> Union[tuple[float, float], tuple[None, None]]:
@@ -359,8 +388,99 @@ def move_files_to_yolo_format(type: DatasetType = DatasetType.TRAIN):
         count += 1
         print(f"Processed {count}/{len(tomos)}: {tomo_id}")
 
+DISTANCE_THRESHOLD = 30.0  # in pixels
 
+def cheap_NMS(type: ModelType):
+    """Apply a simple Non-Maximum Suppression (NMS) based on distance threshold."""
+    if type == ModelType.RTDETR:
+        print("Applying NMS to RTDETR predictions...")
+        predictions_df = pd.read_csv(config.DENORMALIZED_RESULTS_RTDETR)
+        predictions_df = predictions_df.sort_values(by="confidence", ascending=False)
+        result_nms_csv = config.NMS_RESULTS_CSV_RTDETR
 
+    elif type == ModelType.YOLO:
+        print("Applying NMS to YOLO predictions...")
+        predictions_df = pd.read_csv(config.DENORMALIZED_RESULTS_YOLO)
+        predictions_df = predictions_df.sort_values(by="confidence", ascending=False)
+        result_nms_csv = config.NMS_RESULTS_CSV_YOLO
+
+    nms_rows = []
+    # Remove leading/trailing spaces from column names for robust access
+    predictions_df.columns = predictions_df.columns.str.strip()
+
+    for _, group in predictions_df.groupby("tomo_id"):
+        selected = []
+        for _, row in group.iterrows():
+            too_close = False
+            for sel_row in selected:
+                dx = row["Motor axis 2"] - sel_row["Motor axis 2"]
+                dy = row["Motor axis 1"] - sel_row["Motor axis 1"]
+                dz = row["Motor axis 0"] - sel_row["Motor axis 0"]
+                dist = (dx**2 + dy**2 + dz**2) ** 0.5
+                if dist < DISTANCE_THRESHOLD:
+                    too_close = True
+                    break
+            if not too_close:
+                selected.append(row)
+        nms_rows.extend(selected)
+
+    nms_df = pd.DataFrame(nms_rows)
+    nms_df.to_csv(result_nms_csv, index=False)
+
+    print(nms_df)
+
+def escape_latex_caption(caption):
+    """Escape special LaTeX characters in caption"""
+    special_chars = {
+        '_': '\\_',
+        '&': '\\&',
+        '%': '\\%',
+        '$': '\\$',
+        '#': '\\#',
+        '{': '\\{',
+        '}': '\\}',
+    }
+    for char, replacement in special_chars.items():
+        caption = caption.replace(char, replacement)
+    return caption
+
+def save_scaled_latex(data_frame, csv_path, scale=0.7, caption="Table Caption", label="tab:label", index=False):
+    """
+    Save DataFrame as a scaled LaTeX table
+    
+    Parameters:
+    - data_frame: DataFrame to save
+    - csv_path: Original CSV file path (used for naming)
+    - scale: Scaling factor (0.5 = 50%, 1.0 = 100%)
+    """
+    # Generate output filename based on CSV path
+    base_name = os.path.splitext(os.path.basename(csv_path))[0]
+    output_path = f"tables/{base_name}.tex"
+    
+    # Create output directory if it doesn't exist
+    os.makedirs("tables", exist_ok=True)
+    
+    # Generate LaTeX code
+    latex_code = data_frame.to_latex(index=index, escape=True)
+    
+    # Create scaled table
+    scaled_latex = f"""% Generated from {os.path.basename(csv_path)}
+\\begin{{table}}[htbp]
+\\caption{{{escape_latex_caption(caption)}}}
+\\label{{{label}}}
+\\centering
+\\scalebox{{{scale}}}{{
+{latex_code}
+}}
+
+\\end{{table}}
+"""
+    
+    # Save to file
+    with open(output_path, "w") as f:
+        f.write(scaled_latex)
+    
+    print(f"Scaled LaTeX table saved to: {output_path}")
 
 #if __name__ == "__main__":
     # print(find_all_tomo_id_attributes("tomo_00e047"))

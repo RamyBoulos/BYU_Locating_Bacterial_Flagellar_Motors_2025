@@ -90,5 +90,5 @@ def train_model(type: ModelType):
 
 
 if __name__ == "__main__":
-    #train_model(type=ModelType.RTDETR)
-    train_model(type=ModelType.YOLO)
+    train_model(type=ModelType.RTDETR)
+    #train_model(type=ModelType.YOLO)

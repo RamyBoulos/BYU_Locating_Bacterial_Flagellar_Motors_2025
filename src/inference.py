@@ -58,13 +58,18 @@ def inference_on_images(image_paths: list[str], model: Union[RTDETR, YOLO]):
 rtdetr_weights_path = "/data/horse/ws/kein254g-team_project/rtdetr_training_result/exp2/motor_rtdetr_x_102410/weights/best.pt"
 rtdetr_results_path = "/home/kein254g/BYU_Locating_Bacterial_Flagellar_Motors_2025/data/raw/rtdetr_coordinates.csv"
 
+yolo_weights_path = "/data/horse/ws/kein254g-team_project/yolo_training_result/exp2/motor_yolo_10245/weights/best.pt"
+yolo_results_path = "/home/kein254g/BYU_Locating_Bacterial_Flagellar_Motors_2025/data/raw/yolo_coordinates.csv"
+
 if __name__ == "__main__":
     files = get_test_files_path()
-    inference_on_images(files, RTDETR(rtdetr_weights_path))
-    df = pd.DataFrame(rows, columns=["tomo_id", "Motor axis 0", "confidence", "Motor axis 2", "Motor axis 1", "box_width", "box_height"])
-    df.to_csv(rtdetr_results_path, index=False)
+    #inference_on_images(files, RTDETR(config.RTDETR_BEST_WEIGHTS))
+    #df = pd.DataFrame(rows, columns=["tomo_id", "Motor axis 0", "confidence", "Motor axis 2", "Motor axis 1", "box_width", "box_height"])
+    #df.to_csv(config.DENORMALIZED_RESULTS_RTDETR, index=False)
 
-
+    inference_on_images(files, YOLO(config.YOLO_BEST_WEIGHTS))
+    df_yolo = pd.DataFrame(rows, columns=["tomo_id", "Motor axis 0", "confidence", "Motor axis 2", "Motor axis 1", "box_width", "box_height"])
+    df_yolo.to_csv(config.DENORMALIZED_RESULTS_YOLO, index=False)
 
 #df = pd.DataFrame(rows, columns=["tomo_id", "Motor axis 0", "confidence", "Motor axis 2", "Motor axis 1", "box_width", "box_height"])
 #df.to_csv("rtdetr_coordinates.csv", index=False)

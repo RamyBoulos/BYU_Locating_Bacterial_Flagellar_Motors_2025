@@ -89,3 +89,5 @@ YOLO_TRAINING_RESULT = os.path.join(WORKSPACE_ROOT, "yolo_training_result", "exp
 
 
 BOX_LENGTH = 64
+RTDETR_BEST_WEIGHTS = "/data/horse/ws/kein254g-team_project/rtdetr_training_result/exp2/motor_rtdetr_x_102410/weights/best.pt"
+YOLO_BEST_WEIGHTS = "/data/horse/ws/kein254g-team_project/yolo_training_result/exp2/motor_yolo_10245/weights/best.pt"
